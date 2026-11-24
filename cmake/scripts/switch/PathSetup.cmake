@@ -1,0 +1,10 @@
+set(prefix ${CMAKE_BINARY_DIR}/install)
+set(CMAKE_INSTALL_PREFIX ${prefix})
+set(libdir ${prefix}/lib)
+set(bindir ${prefix}/bin)
+set(includedir ${prefix}/include)
+set(datarootdir ${prefix}/share)
+set(datadir ${datarootdir})
+
+set(PATH_DEFINES -DBIN_INSTALL_PATH=\"/switch/kodi\" -DINSTALL_PATH=\"/switch/kodi\")
+list(APPEND final_message "Install path on SD: sdmc:/switch/kodi")

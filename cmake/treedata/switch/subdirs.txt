@@ -1,0 +1,8 @@
+xbmc/platform/posix                 platform/posix
+xbmc/platform/posix/filesystem      platform/posix/filesystem
+xbmc/platform/posix/threads         platform/posix/threads
+xbmc/platform/posix/utils           platform/posix/utils
+xbmc/platform/switch                platform/switch
+xbmc/platform/common/speech         platform/common/speech
+xbmc/input/touch                    input/touch
+xbmc/input/touch/generic            input/touch/generic
