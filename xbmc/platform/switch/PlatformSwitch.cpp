@@ -8,6 +8,7 @@
 
 #include "PlatformSwitch.h"
 
+#include "cores/AudioEngine/Sinks/AESinkSwitch.h"
 #include "windowing/switch/WinSystemSwitchGLESContext.h"
 
 #include <cstdlib>
@@ -25,6 +26,7 @@ bool CPlatformSwitch::InitStageOne()
   setenv("OS", "Switch", true);
 
   KODI::WINDOWING::SWITCH::CWinSystemSwitchGLESContext::Register();
+  CAESinkSwitch::Register();
   return true;
 }
 

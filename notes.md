@@ -60,13 +60,14 @@ into what upstream puts in `.rodata`, so:
   execvp/waitpid stubs), `DlStubs`, network (nifm), storage (SD card).
 - `xbmc/windowing/switch`: EGL/GLES window system on `nwindowGetDefault()`,
   pad and touch input via `CAppInboundProtocol`; registered as "switch".
+- `xbmc/cores/AudioEngine/Sinks/AESinkSwitch.*`: libnx `audout` PCM sink
+  (48 kHz, s16 stereo, four aligned buffers), registered in `InitStageOne`.
 - Force-included compat header: `xbmc/platform/switch/compat/switch_posix.h`.
 - Kodi CMake touched with small `TARGET_SWITCH` guards; these are merge-conflict
   points when rebasing upstream.
 
 ## Known gaps
 
-- No audio sink yet (`AESinkSwitch` port pending).
 - Python and binary add-ons disabled/unsupported (no `dlopen`).
 - Software video decode only; no HW decode or surround passthrough.
 - Online repos need TLS trust: `system/certs/cacert.pem` plus

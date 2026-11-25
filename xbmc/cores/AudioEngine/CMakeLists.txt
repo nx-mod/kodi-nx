@@ -9,6 +9,7 @@ set(SOURCES AEResampleFactory.cpp
             Engines/ActiveAE/ActiveAESound.cpp
             Engines/ActiveAE/ActiveAESettings.cpp
             Sinks/AESinkNULL.cpp
+            Sinks/AESinkSwitch.cpp
             Utils/AEBitstreamPacker.cpp
             Utils/AEChannelInfo.cpp
             Utils/AEDeviceInfo.cpp
@@ -37,7 +38,8 @@ set(HEADERS AEResampleFactory.h
             Interfaces/AEStream.h
             Interfaces/IAudioCallback.h
             Interfaces/ThreadedAE.h
-            Sinks/AESinkNULL.h
+             Sinks/AESinkNULL.h
+             Sinks/AESinkSwitch.h
             Utils/AEAudioFormat.h
             Utils/AEBitstreamPacker.h
             Utils/AEChannelData.h
