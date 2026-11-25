@@ -6,6 +6,12 @@ source "${SCRIPT_DIR}/env.sh"
 
 BUILD_DIR="${BUILD_DIR:-${ROOT_DIR}/build/switch}"
 
+LINKER_SCRIPT="${DEVKITPRO}/libnx/switch.ld"
+if ! cmp -s "${ROOT_DIR}/cmake/toolchain/switch.ld" "${LINKER_SCRIPT}"; then
+  sudo -n cp "${ROOT_DIR}/cmake/toolchain/switch.ld" "${LINKER_SCRIPT}" 2>/dev/null || \
+    echo "WARNING: install cmake/toolchain/switch.ld to ${LINKER_SCRIPT} with sudo before building"
+fi
+
 cmake -S "${ROOT_DIR}" -B "${BUILD_DIR}" -G Ninja \
   -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" \
   -DCORE_SYSTEM_NAME=switch \
