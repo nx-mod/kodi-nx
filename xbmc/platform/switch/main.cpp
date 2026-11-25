@@ -25,12 +25,27 @@ constexpr const char* KODI_HOME = "/switch/kodi";
 
 void BootMark(const char* what, int value = 0)
 {
-  FILE* file = fopen("sdmc:/switch/kodi/boot.txt", "a");
-  if (file)
+  FsFileSystem* fs = fsdevGetDeviceFileSystem("sdmc");
+  if (!fs)
+    return;
+
+  FsFile file;
+  if (R_FAILED(fsFsOpenFile(fs, "/switch/kodi/boot.txt",
+                            FsOpenMode_Write | FsOpenMode_Append, &file)))
   {
-    fprintf(file, "%s %d\n", what, value);
-    fclose(file);
+    if (R_FAILED(fsFsCreateFile(fs, "/switch/kodi/boot.txt", 0, 0)))
+      return;
+    if (R_FAILED(fsFsOpenFile(fs, "/switch/kodi/boot.txt",
+                              FsOpenMode_Write | FsOpenMode_Append, &file)))
+      return;
   }
+
+  s64 size = 0;
+  fsFileGetSize(&file, &size);
+  char line[128];
+  const int len = snprintf(line, sizeof(line), "%s %d\n", what, value);
+  fsFileWrite(&file, size, line, static_cast<u64>(len), 0);
+  fsFileClose(&file);
 }
 
 void BringUpServices()
