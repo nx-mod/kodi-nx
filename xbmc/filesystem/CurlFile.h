@@ -187,7 +187,11 @@ namespace XFILE
       bool m_skipshout;
       bool m_postdataset;
       bool m_allowRetry;
+#ifdef TARGET_SWITCH
+      bool m_verifyPeer = false;
+#else
       bool m_verifyPeer = true;
+#endif
       bool m_failOnError = true;
       curl_slist* m_dnsCacheList = nullptr;
 
