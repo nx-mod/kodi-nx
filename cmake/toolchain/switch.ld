@@ -68,7 +68,7 @@ SECTIONS
 
 	.note.gnu.build-id : { *(.note.gnu.build-id) } :rodata
 
-	.rodata_pad : { . = ALIGN(0x10000); } :rodata
+	.rodata_pad : { . = ALIGN(0x10000); BYTE(0); } :rodata
 
 	/* =========== RELRO section =========== */
 	. = ALIGN(0x1000);
