@@ -88,12 +88,15 @@ sections upstream places in read-only memory:
 
 ## Gaps and dead ends
 
-- **Online repositories do not work.** HTTPS fails with `SSL peer certificate
-  ... not OK (60)`. Tried and reverted: `catrustfile` advanced setting,
-  `CURL_CA_BUNDLE` env var (a curl CLI feature, not automatic in libcurl),
-  explicit `CURLOPT_CAINFO`, and `CURLOPT_SSL_VERIFYPEER=0`. The explicit CA
-  path and verification-off attempts caused Atmosphere fatals (`2349-0008`,
-  libnx binder `NoInit`) on repository access. Use local ZIP install instead.
+- **Online repositories are still being debugged.** HTTPS fails with
+  `SSL peer certificate ... not OK (60)`. Tried and reverted: `catrustfile`,
+  `CURL_CA_BUNDLE` (a curl CLI feature, not automatic in libcurl), the full
+  200 KB CA store via `CURLOPT_CAINFO`, and `CURLOPT_SSL_VERIFYPEER=0`. Those
+  caused Atmosphere fatals (`2349-0008`, libnx binder `NoInit`). Current attempt
+  (`67ecaf2`) sets `CURLOPT_CAINFO` to a compact 37 KB bundle of 25 common roots
+  plus ISRG Root YR at `sdmc:/switch/kodi/system/certs/cacert-bundle.pem`,
+  bypassing Kodi's `CFile::Exists` check. That file must be copied to the
+  Switch's `system/certs` folder. Local ZIP install works regardless.
 - Python add-ons and binary add-ons are unsupported (`ENABLE_PYTHON=OFF`,
   `dlopen` stubbed).
 - Software video decode only; no HW decode, no surround passthrough.
