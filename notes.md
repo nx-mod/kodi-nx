@@ -70,8 +70,9 @@ into what upstream puts in `.rodata`, so:
 
 - Python and binary add-ons disabled/unsupported (no `dlopen`).
 - Software video decode only; no HW decode or surround passthrough.
-- Online repos need TLS trust: `system/certs/cacert.pem` plus
-  `userdata/advancedsettings.xml` with `<catrustfile>`; still being verified.
+- Online repos: `system/certs/cacert.pem` on the SD, plus `CURL_CA_BUNDLE`
+  set to that file at startup (the `catrustfile` setting alone was not enough
+  for the libnx curl backend). Being verified on hardware.
 
 ## Outstanding reference work
 
