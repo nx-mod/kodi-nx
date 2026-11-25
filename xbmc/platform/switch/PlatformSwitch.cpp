@@ -8,6 +8,8 @@
 
 #include "PlatformSwitch.h"
 
+#include "windowing/switch/WinSystemSwitchGLESContext.h"
+
 #include <cstdlib>
 
 CPlatform* CPlatform::CreateInstance()
@@ -21,6 +23,8 @@ bool CPlatformSwitch::InitStageOne()
     return false;
 
   setenv("OS", "Switch", true);
+
+  KODI::WINDOWING::SWITCH::CWinSystemSwitchGLESContext::Register();
   return true;
 }
 

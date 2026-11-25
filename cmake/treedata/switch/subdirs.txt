@@ -5,6 +5,8 @@ xbmc/platform/posix/utils           platform/posix/utils
 xbmc/platform/switch                platform/switch
 xbmc/platform/switch/network        platform/switch/network
 xbmc/platform/switch/storage        platform/switch/storage
+xbmc/windowing/switch               windowing/switch
+xbmc/cores/RetroPlayer/shaders/gles cores/RetroPlayer/shaders/gles
 xbmc/platform/common/speech         platform/common/speech
 xbmc/input/touch                    input/touch
 xbmc/input/touch/generic            input/touch/generic
