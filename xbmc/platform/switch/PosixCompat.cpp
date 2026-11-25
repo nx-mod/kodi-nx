@@ -7,6 +7,10 @@
  */
 
 #include <ctime>
+#include <condition_variable>
+#include <deque>
+#include <mutex>
+#include <pthread.h>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
@@ -105,4 +109,71 @@ extern "C" pid_t waitpid(pid_t, int*, int)
 {
   errno = ECHILD;
   return -1;
+}
+
+extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
+
+extern "C" int __wrap_pthread_create(pthread_t* thread,
+                                     const pthread_attr_t* attr,
+                                     void* (*start)(void*),
+                                     void* arg)
+{
+  if (attr)
+    return __real_pthread_create(thread, attr, start, arg);
+
+  pthread_attr_t big;
+  pthread_attr_init(&big);
+  pthread_attr_setstacksize(&big, 1u << 20);
+  const int rc = __real_pthread_create(thread, &big, start, arg);
+  pthread_attr_destroy(&big);
+  return rc;
+}
+
+namespace
+{
+std::mutex g_reapMutex;
+std::condition_variable g_reapCv;
+std::deque<pthread_t> g_reapQueue;
+bool g_reaperRunning = false;
+
+void* Reaper(void*)
+{
+  for (;;)
+  {
+    pthread_t t;
+    {
+      std::unique_lock<std::mutex> lock(g_reapMutex);
+      g_reapCv.wait(lock, [] { return !g_reapQueue.empty(); });
+      t = g_reapQueue.front();
+      g_reapQueue.pop_front();
+    }
+    pthread_join(t, nullptr);
+  }
+  return nullptr;
+}
+
+void StartReaper()
+{
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  pthread_attr_setstacksize(&attr, 64 * 1024);
+  pthread_t reaper;
+  const int rc = __real_pthread_create(&reaper, &attr, Reaper, nullptr);
+  pthread_attr_destroy(&attr);
+  g_reaperRunning = rc == 0;
+}
+} // namespace
+
+extern "C" int __wrap_pthread_detach(pthread_t thread)
+{
+  static std::once_flag once;
+  std::call_once(once, StartReaper);
+  if (!g_reaperRunning)
+    return 0;
+  {
+    std::lock_guard<std::mutex> lock(g_reapMutex);
+    g_reapQueue.push_back(thread);
+  }
+  g_reapCv.notify_one();
+  return 0;
 }

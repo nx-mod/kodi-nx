@@ -10,6 +10,7 @@
 #include "application/AppParamParser.h"
 #include "platform/xbmc.h"
 
+#include <cstdio>
 #include <cstdlib>
 #include <locale.h>
 #include <sys/stat.h>
@@ -21,6 +22,16 @@ namespace
 {
 constexpr const char* KODI_ROOT = "sdmc:/switch/kodi";
 constexpr const char* KODI_HOME = "/switch/kodi";
+
+void BootMark(const char* what, int value = 0)
+{
+  FILE* file = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (file)
+  {
+    fprintf(file, "%s %d\n", what, value);
+    fclose(file);
+  }
+}
 
 void BringUpServices()
 {
@@ -42,20 +53,30 @@ void BringUpServices()
 
 int main(int argc, char* argv[])
 {
-  BringUpServices();
-
   mkdir(KODI_ROOT, 0777);
+  BootMark("main-entered");
+
+  BringUpServices();
+  BootMark("services-up");
+
   chdir(KODI_ROOT);
   setenv("HOME", KODI_HOME, 1);
   setenv("KODI_BIN_HOME", KODI_HOME, 1);
   setlocale(LC_NUMERIC, "C");
+  BootMark("environment-ready");
 
   CAppParamParser appParamParser;
   appParamParser.Parse(argv, argc);
+  BootMark("params-parsed");
 
   CAppEnvironment::SetUp(appParamParser.GetAppParams());
+  BootMark("environment-set-up");
+
   int status = XBMC_Run(true);
+  BootMark("xbmc-run-returned", status);
+
   CAppEnvironment::TearDown();
+  BootMark("torn-down");
 
   socketExit();
   return status;
