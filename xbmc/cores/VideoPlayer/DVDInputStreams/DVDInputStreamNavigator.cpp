@@ -46,6 +46,12 @@ struct iovec
   void *iov_base;     /* Pointer to data. */
   size_t iov_len;     /* Length of data.  */
 };
+#elif defined(TARGET_SWITCH)
+struct iovec
+{
+  void* iov_base;
+  size_t iov_len;
+};
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif

@@ -91,7 +91,11 @@ std::tuple<bool, int64_t> GetTimezoneBias(const SystemTime& time)
   if (!localtime_r(&*t, &tms))
     return {false, 0}; // error
 
+#if defined(TARGET_SWITCH)
+  return {true, 0};
+#else
   return {true, -tms.tm_gmtoff / 60};
+#endif
 }
 
 void GetLocalTime(SystemTime* systemTime)
@@ -121,7 +125,11 @@ int FileTimeToLocalFileTime(const FileTime* fileTime, FileTime* localFileTime)
   FileTimeToTimeT(fileTime, &ft);
   localtime_r(&ft, &tm_ft);
 
+#if defined(TARGET_SWITCH)
+  l.QuadPart += static_cast<unsigned long long>(_timezone) * 10000000;
+#else
   l.QuadPart += static_cast<unsigned long long>(tm_ft.tm_gmtoff) * 10000000;
+#endif
 
   localFileTime->lowDateTime = l.u.LowPart;
   localFileTime->highDateTime = l.u.HighPart;
@@ -210,7 +218,11 @@ int LocalFileTimeToFileTime(const FileTime* localFileTime, FileTime* fileTime)
   FileTimeToTimeT(localFileTime, &ft);
   localtime_r(&ft, &tm_ft);
 
+#if defined(TARGET_SWITCH)
+  l.QuadPart -= static_cast<unsigned long long>(_timezone) * 10000000;
+#else
   l.QuadPart -= static_cast<unsigned long long>(tm_ft.tm_gmtoff) * 10000000;
+#endif
 
   fileTime->lowDateTime = l.u.LowPart;
   fileTime->highDateTime = l.u.HighPart;

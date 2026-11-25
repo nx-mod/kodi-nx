@@ -1,11 +1,16 @@
-set(SOURCES emu_dummy.cpp
-            emu_msvcrt.cpp)
+if(CORE_SYSTEM_NAME STREQUAL switch)
+  set(SOURCES emu_dummy.cpp)
+else()
+  set(SOURCES emu_dummy.cpp
+              emu_msvcrt.cpp)
+endif()
 
 set(HEADERS emu_dummy.h
             emu_msvcrt.h)
 
 core_add_library(dllexports)
 
+if(NOT CORE_SYSTEM_NAME STREQUAL switch)
 if(APPLE)
   add_library(wrapper OBJECT wrapper.c)
   add_custom_target(wrapper.def ALL ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wrapper_mach_alias wrapper.def)
@@ -29,5 +34,6 @@ elseif(NOT CORE_SYSTEM_NAME STREQUAL windows AND NOT CORE_SYSTEM_NAME STREQUAL w
   set_target_properties(wrapper PROPERTIES FOLDER "Build Utilities")
   set_target_properties(wrapper.def PROPERTIES FOLDER "Build Utilities")
   add_dependencies(wrapper.def wrapper)
+endif()
 endif()
 

@@ -31,6 +31,7 @@ if(TARGET ${APP_NAME_LC}::OpenGl)
 endif()
 
 if(TARGET ${APP_NAME_LC}::OpenGLES AND ("android" IN_LIST CORE_PLATFORM_NAME_LC OR
+                            "switch" IN_LIST CORE_PLATFORM_NAME_LC OR
                             "ios" IN_LIST CORE_PLATFORM_NAME_LC OR
                             "tvos" IN_LIST CORE_PLATFORM_NAME_LC OR
                             "gbm" IN_LIST CORE_PLATFORM_NAME_LC OR

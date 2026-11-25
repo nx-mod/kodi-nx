@@ -18,7 +18,7 @@ pthread_mutexattr_t& CRecursiveMutex::getRecursiveAttr()
     pthread_mutexattr_t recursiveAttr;
     pthread_mutexattr_init(&recursiveAttr);
     pthread_mutexattr_settype(&recursiveAttr, PTHREAD_MUTEX_RECURSIVE);
-#if !defined(TARGET_ANDROID)
+#if !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)
     pthread_mutexattr_setprotocol(&recursiveAttr, PTHREAD_PRIO_INHERIT);
 #endif
     return recursiveAttr;

@@ -16,7 +16,7 @@ if(NOT TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
   
     find_package(Patch MODULE REQUIRED ${SEARCH_QUIET})
   
-    if(UNIX)
+    if(UNIX OR CORE_SYSTEM_NAME STREQUAL switch)
       # ancient patch (Apple/freebsd) fails to patch tinyxml2 CMakeLists.txt file due to it being crlf encoded
       # Strip crlf before applying patches.
       # Freebsd fails even harder and requires both .patch and CMakeLists.txt to be crlf stripped

@@ -272,7 +272,11 @@ set(required_deps ASS>=0.15.0
                   TinyXML
                   TinyXML2
                   ZLIB
-                  ${PLATFORM_REQUIRED_DEPS})
+                   ${PLATFORM_REQUIRED_DEPS})
+
+if(CORE_SYSTEM_NAME STREQUAL switch)
+  list(REMOVE_ITEM required_deps LibDvd)
+endif()
 
 # Optional dependencies. Keep in alphabetical order please
 set(optional_deps Alsa>=1.0.27

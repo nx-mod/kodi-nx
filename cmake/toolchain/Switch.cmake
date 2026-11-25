@@ -1,5 +1,11 @@
 include("$ENV{DEVKITPRO}/cmake/Switch.cmake")
 
+if(DEFINED ENV{LIBNX} AND EXISTS "$ENV{LIBNX}/switch.specs")
+  set(NX_ROOT "$ENV{LIBNX}")
+endif()
+
+set(CMAKE_PROJECT_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/SwitchProject.cmake")
+
 if(DEFINED ENV{LIBNX} AND EXISTS "$ENV{LIBNX}/include/switch.h")
   set(NX_ROOT "$ENV{LIBNX}")
   list(PREPEND CMAKE_FIND_ROOT_PATH "${NX_ROOT}")

@@ -1,0 +1,9 @@
+foreach(lang C CXX)
+  if(NOT "${CMAKE_${lang}_FLAGS}" MATCHES "_GNU_SOURCE")
+    set(CMAKE_${lang}_FLAGS "${CMAKE_${lang}_FLAGS} -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L")
+  endif()
+endforeach()
+
+if(NOT "${CMAKE_CXX_FLAGS}" MATCHES "SPDLOG_NO_TZ_OFFSET")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSPDLOG_NO_TZ_OFFSET")
+endif()

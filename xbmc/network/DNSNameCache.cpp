@@ -28,7 +28,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 
-#if defined(TARGET_FREEBSD)
+#if defined(TARGET_FREEBSD) || defined(TARGET_SWITCH)
 #include <sys/socket.h>
 #endif
 

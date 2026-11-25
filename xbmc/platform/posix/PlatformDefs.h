@@ -113,6 +113,17 @@ typedef int (*LPTHREAD_START_ROUTINE)(void *);
   #if defined(TARGET_FREEBSD)
     #define statfs64 statfs
   #endif
+#elif defined(TARGET_SWITCH)
+  #define stat64 stat
+  #define __stat64 stat
+  #define fstat64 fstat
+  #define lstat64 lstat
+  #define statvfs64 statvfs
+  #define fseeko64 fseeko
+  #define ftello64 ftello
+  #define lseek64 lseek
+  #define fopen64 fopen
+  typedef int64_t off64_t;
 #else
   #define __stat64 stat64
 #endif
