@@ -7,6 +7,7 @@
  */
 
 #include "CurlFile.h"
+#include "switch_cacert.h"
 
 #include "File.h"
 #include "ServiceBroker.h"
@@ -747,8 +748,9 @@ void CCurlFile::SetCommonOptions(CReadState* state, bool failOnError /* = true *
   std::string caCert = CSpecialProtocol::TranslatePath(
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_caTrustFile);
 #ifdef TARGET_SWITCH
-  g_curlInterface.easy_setopt(h, CURLOPT_CAINFO,
-                              "sdmc:/switch/kodi/system/certs/cacert-bundle.pem");
+  curl_blob blob{const_cast<unsigned char*>(kSwitchCaCert), kSwitchCaCertSize - 1,
+                 CURL_BLOB_NOCOPY};
+  g_curlInterface.easy_setopt(h, CURLOPT_CAINFO_BLOB, &blob);
 #else
   if (!caCert.empty() && XFILE::CFile::Exists(caCert))
     g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, caCert.c_str());

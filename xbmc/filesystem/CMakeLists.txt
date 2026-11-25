@@ -72,6 +72,7 @@ set(HEADERS AddonsDirectory.h
             CacheStrategy.h
             CircularCache.h
             CurlFile.h
+            switch_cacert.h
             CurlHttpClient.h
             DAVCommon.h
             DAVDirectory.h
