@@ -748,9 +748,6 @@ void CCurlFile::SetCommonOptions(CReadState* state, bool failOnError /* = true *
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_caTrustFile);
   if (!caCert.empty() && XFILE::CFile::Exists(caCert))
     g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, caCert.c_str());
-#ifdef TARGET_SWITCH
-  g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, "sdmc:/switch/kodi/system/certs/cacert.pem");
-#endif
 
   // From OpenSSL 3.0 CURLOPT_CAINFO not works (on UWP), use CURLOPT_CAINFO_BLOB instead
   if (!cachedCaCertsBlob.empty())
