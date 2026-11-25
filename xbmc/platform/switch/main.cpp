@@ -76,6 +76,7 @@ int main(int argc, char* argv[])
   chdir(KODI_ROOT);
   setenv("HOME", KODI_HOME, 1);
   setenv("KODI_BIN_HOME", KODI_HOME, 1);
+  setenv("CURL_CA_BUNDLE", "sdmc:/switch/kodi/system/certs/cacert.pem", 1);
   setlocale(LC_NUMERIC, "C");
   BootMark("environment-ready");
 
