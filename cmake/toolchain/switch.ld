@@ -68,10 +68,12 @@ SECTIONS
 
 	.note.gnu.build-id : { *(.note.gnu.build-id) } :rodata
 
+	.rodata_pad : { . = ALIGN(0x10000); } :rodata
+
 	/* =========== RELRO section =========== */
 	. = ALIGN(0x1000);
 	PROVIDE_HIDDEN( __relro_start = . );
-	.rodata :
+	.rodata : ALIGN(0x1000)
 	{
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
 		. = ALIGN(8);
@@ -86,7 +88,7 @@ SECTIONS
 
 	.gcc_except_table  : { *(.gcc_except_table .gcc_except_table.*) } :data
 	.eh_frame_hdr      : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) } :data
-	.eh_frame          : { KEEP (*(.eh_frame)) *(.eh_frame.*) } :data
+	.eh_frame          : ALIGN(0x1000) { KEEP (*(.eh_frame)) *(.eh_frame.*) } :data
 	.gnu_extab         : { *(.gnu_extab*) } :data
 	.exception_ranges  : { *(.exception_ranges .exception_ranges*) } :data
 
