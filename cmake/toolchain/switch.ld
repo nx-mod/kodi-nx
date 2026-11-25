@@ -73,9 +73,6 @@ SECTIONS
 	/* =========== RELRO section =========== */
 	. = ALIGN(0x1000);
 	PROVIDE_HIDDEN( __relro_start = . );
-	/* =========== RELRO section =========== */
-	. = ALIGN(0x1000);
-	PROVIDE_HIDDEN( __relro_start = . );
 	.preinit_array :
 	{
 		PROVIDE_HIDDEN( __preinit_array_start = . );
