@@ -73,29 +73,9 @@ SECTIONS
 	/* =========== RELRO section =========== */
 	. = ALIGN(0x1000);
 	PROVIDE_HIDDEN( __relro_start = . );
-	.rodata : ALIGN(0x1000)
-	{
-		*(.rodata .rodata.* .gnu.linkonce.r.*)
-		. = ALIGN(8);
-	} :data
-
-	.tls.align :
-	{
-		QUAD( MAX( ALIGNOF(.tdata), ALIGNOF(.tbss) ) )
-	} :data
-
-	PROVIDE_HIDDEN( __tls_align = ADDR(.tls.align) );
-
-	.gcc_except_table  : { *(.gcc_except_table .gcc_except_table.*) } :data
-	.eh_frame_hdr      : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) } :data
-	.eh_frame          : ALIGN(0x1000) { KEEP (*(.eh_frame)) *(.eh_frame.*) } :data
-	.gnu_extab         : { *(.gnu_extab*) } :data
-	.exception_ranges  : { *(.exception_ranges .exception_ranges*) } :data
-
-	PROVIDE_HIDDEN( __eh_frame_hdr_start = ADDR(.eh_frame_hdr)                         );
-	PROVIDE_HIDDEN( __eh_frame_hdr_end   = ADDR(.eh_frame_hdr) + SIZEOF(.eh_frame_hdr) );
-
-
+	/* =========== RELRO section =========== */
+	. = ALIGN(0x1000);
+	PROVIDE_HIDDEN( __relro_start = . );
 	.preinit_array :
 	{
 		PROVIDE_HIDDEN( __preinit_array_start = . );
@@ -137,6 +117,29 @@ SECTIONS
 	/* =========== DATA section =========== */
 	. = ALIGN(0x1000);
 	PROVIDE_HIDDEN( __data_start = . );
+	.rodata : ALIGN(0x1000)
+	{
+		*(.rodata .rodata.* .gnu.linkonce.r.*)
+		. = ALIGN(8);
+	} :data
+
+	.tls.align :
+	{
+		QUAD( MAX( ALIGNOF(.tdata), ALIGNOF(.tbss) ) )
+	} :data
+
+	PROVIDE_HIDDEN( __tls_align = ADDR(.tls.align) );
+
+	.gcc_except_table  : { *(.gcc_except_table .gcc_except_table.*) } :data
+	.eh_frame_hdr      : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) } :data
+	.eh_frame          : ALIGN(0x1000) { KEEP (*(.eh_frame)) *(.eh_frame.*) } :data
+	.gnu_extab         : { *(.gnu_extab*) } :data
+	.exception_ranges  : { *(.exception_ranges .exception_ranges*) } :data
+
+	PROVIDE_HIDDEN( __eh_frame_hdr_start = ADDR(.eh_frame_hdr)                         );
+	PROVIDE_HIDDEN( __eh_frame_hdr_end   = ADDR(.eh_frame_hdr) + SIZEOF(.eh_frame_hdr) );
+
+
 
 	.data :
 	{
