@@ -68,6 +68,8 @@ void BringUpServices()
 
 int main(int argc, char* argv[])
 {
+  fsdevMountSdmc();
+
   mkdir(KODI_ROOT, 0777);
   BootMark("main-entered");
 
