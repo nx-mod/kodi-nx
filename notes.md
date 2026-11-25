@@ -92,11 +92,13 @@ sections upstream places in read-only memory:
   `SSL peer certificate ... not OK (60)`. Tried and reverted: `catrustfile`,
   `CURL_CA_BUNDLE` (a curl CLI feature, not automatic in libcurl), the full
   200 KB CA store via `CURLOPT_CAINFO`, and `CURLOPT_SSL_VERIFYPEER=0`. Those
-  caused Atmosphere fatals (`2349-0008`, libnx binder `NoInit`). Current attempt
-  (`67ecaf2`) sets `CURLOPT_CAINFO` to a compact 37 KB bundle of 25 common roots
-  plus ISRG Root YR at `sdmc:/switch/kodi/system/certs/cacert-bundle.pem`,
-  bypassing Kodi's `CFile::Exists` check. That file must be copied to the
-  Switch's `system/certs` folder. Local ZIP install works regardless.
+  caused Atmosphere fatals (`2349-0008`, libnx binder `NoInit`). Research showed
+  the installed curl is switchfin's **mbedTLS-backed 8.23.0**, not devkitPro's
+  libnx-SSL build, so the binder fatal was unrelated to CA handling. Current
+  approach (`5a831eb`) embeds a compact 37 KB bundle of 25 common roots plus
+  ISRG Root YR in `xbmc/filesystem/switch_cacert.h` and sets
+  `CURLOPT_CAINFO_BLOB` directly. No SD-side CA file is needed. Verification
+  stays enabled. Local ZIP install works regardless.
 - Python add-ons and binary add-ons are unsupported (`ENABLE_PYTHON=OFF`,
   `dlopen` stubbed).
 - Software video decode only; no HW decode, no surround passthrough.
