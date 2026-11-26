@@ -201,7 +201,7 @@ extern "C" void __wrap_exit(int code)
   FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
   if (mark)
   {
-    fprintf(mark, "exit-called %d\n", code);
+    fprintf(mark, "exit-called %d caller %p\n", code, __builtin_return_address(0));
     fclose(mark);
   }
   __real_exit(code);
