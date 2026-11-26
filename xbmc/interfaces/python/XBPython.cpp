@@ -78,7 +78,7 @@ XBPython::XBPython()
   // Info about interesting python envvars available
   // at http://docs.python.org/using/cmdline.html#environment-variables
 
-#if defined(TARGET_WASM)
+#if defined(TARGET_WASM) || defined(TARGET_SWITCH)
   // CPython is linked statically here, so it has no install prefix to find on a
   // real filesystem. The standard library is preloaded into the Emscripten VFS
   // as <PYTHONHOME>/lib/pythonXY.zip, which is the zip landmark getpath() looks

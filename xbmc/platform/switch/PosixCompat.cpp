@@ -11,9 +11,11 @@
 #include <deque>
 #include <mutex>
 #include <pthread.h>
+#include <switch.h>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <sys/stat.h>
 #include <sys/utsname.h>
 #include <sys/resource.h>
 #include <unistd.h>
@@ -176,4 +178,18 @@ extern "C" int __wrap_pthread_detach(pthread_t thread)
   }
   g_reapCv.notify_one();
   return 0;
+}
+
+extern "C" int pause()
+{
+  for (;;)
+    svcSleepThread(1000000000ULL);
+  return -1;
+}
+
+extern "C" int fstatat(int dirfd, const char* path, struct stat* st, int flags)
+{
+  (void)dirfd;
+  (void)flags;
+  return stat(path, st);
 }

@@ -26,7 +26,7 @@ folders to `/switch/kodi/`. Logs: `/switch/kodi/boot.txt` and
 
 ## Not yet supported
 
-Python add-ons, binary add-ons, hardware video decode, surround passthrough,
+Binary add-ons, hardware video decode, surround passthrough,
 thumbnail encoders, event clients/JSON-RPC/web server, and automatic updates.
 
 Upstream: [xbmc/xbmc](https://github.com/xbmc/xbmc)

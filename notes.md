@@ -49,8 +49,9 @@ NRO. Result: `build/switch/kodi.nro`, also staged to
 
 ## Remaining work
 
-- Python add-ons: static CPython 3.14.6 based on PyNeXt's Switch patches; host
-  interpreter built, target library in progress.
+- Python add-ons: static CPython 3.14.6 from `nx-mod/python-nx` linked into the
+  NRO; stdlib zip installed at `/switch/kodi/lib/python314.zip`. Awaiting
+  hardware verification of add-on execution.
 - Binary add-ons: not available; `dlopen` is stubbed. Would require building
   add-ons statically into the NRO.
 - Online repositories: HTTPS path implemented; awaiting hardware verification.
