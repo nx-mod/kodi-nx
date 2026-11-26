@@ -220,3 +220,21 @@ extern "C" void __wrap__Py_FatalErrorFunc(const char* func, const char* message)
   }
   __real__Py_FatalErrorFunc(func, message);
 }
+
+extern "C" int __real__Py_write_noraise(int, const void*, size_t);
+
+extern "C" int __wrap__Py_write_noraise(int fd, const void* buf, size_t size)
+{
+  if (fd == 2 && size && size < 1024)
+  {
+    FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+    if (mark)
+    {
+      fwrite("python-write ", 1, 13, mark);
+      fwrite(buf, 1, size, mark);
+      fputc('\n', mark);
+      fclose(mark);
+    }
+  }
+  return __real__Py_write_noraise(fd, buf, size);
+}
