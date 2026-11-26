@@ -1,115 +1,59 @@
-# Kodi-NX build notes
+# Kodi-NX notes
 
-## Current state
+## What works
 
-Kodi 23.0-ALPHA1 builds and runs as a Switch 1 NRO. Verified working:
-Estuary GUI, navigation, settings, audio playback (libnx `audout`), local ZIP
-add-on installation, and clean exit back to hbmenu. Output: `build/switch/kodi.nro`.
-
-Not working yet: online add-on repositories, Python/binary add-ons, hardware
-video decode, and several image encoders (thumbnails). See "Gaps" below.
-
-## SD card layout
-
-```
-/switch/kodi.nro                  NRO that hbmenu scans in /switch root
-/switch/kodi/kodi.nro             same NRO, kept beside its data
-/switch/kodi/{addons,media,system,userdata}
-/switch/kodi/boot.txt             boot stage marks
-/switch/kodi/.kodi/temp/kodi.log  Kodi log
-```
-
-Build output is also staged to `/storage/emulated/0/Download/kodi-nx/` when
-that directory exists.
+- Kodi 23.0-ALPHA1 runs as a Switch 1 NRO: Estuary GUI, menus, navigation,
+  settings, library databases, local ZIP add-on installation, audio playback
+  and clean exit.
+- SQLite uses `nx-mod/sqlite-nx` with a native libnx VFS. All Kodi databases
+  (Addons, ViewModes, Textures, Music, Video, TV, EPG) initialize cleanly.
+- Audio uses libnx `audout`: 48 kHz signed 16-bit stereo.
+- Input: Switch pad mapped to Kodi keys; touch mapped to mouse; key repeat.
+- Boot progress is written to `sdmc:/switch/kodi/boot.txt`; full log in
+  `sdmc:/switch/kodi/.kodi/temp/kodi.log`.
 
 ## Build
 
 ```
-./build_nx.sh                 # configure + build + NRO post-processing + stage
-./build_nx.sh --clean         # fresh build directory
-JOBS=4 ./build_nx.sh          # job count (default 4; 8 locks up this host)
+./build_nx.sh                 # configure, build, package, stage
+./build_nx.sh --clean         # fresh build
+JOBS=4 ./build_nx.sh          # 4 jobs (8 locks up this host)
 ```
 
-`build_nx.sh` installs the patched linker script, builds host TexturePacker if
-missing, then calls `tools/switch/configure.sh` and `cmake --build`.
-The NRO post-processing step is required (`tools/switch/fix_nro_size.py`).
+`build_nx.sh` sets up devkitA64 + flat libnx, installs the patched Switch
+linker script, builds host TexturePacker, runs CMake, and post-processes the
+NRO. Result: `build/switch/kodi.nro`, also staged to
+`/storage/emulated/0/Download/kodi-nx/`.
 
-## Toolchain and portlibs
+## Install on Switch
 
-- devkitA64 GCC 16.1.0, libnx from `~/nx-mod/libnx/nx` (built, v4.12.0).
-- Portlibs in `/opt/devkitpro/portlibs/switch`:
-  - pacman: `switch-curl`, `switch-mbedtls`, `switch-libdrm_nouveau`,
-    `switch-tinyxml2`, `switch-libpcre2`, `switch-libxml2`, `switch-liblzma`,
-    `switch-libzstd`, `switch-liblzo2`, `switch-giflib`.
-  - curl 8.23.0 + mbedTLS 3.6.8 from dragonflylee/switchfin releases (dkp's
-    curl 7.69.1 is too old for Kodi 23; dkp mbedTLS 2.28 lacks symbols).
-  - sqlite3 from `nx-mod/sqlite-nx` with a native libnx VFS.
-  - Brotli 1.1.0, libuuid stand-in (`randomGet`), empty `libdl`/`librt`/`libutil`.
-  - GNU libiconv 1.17 built with `-DUSE_DOS` (CP437 zip filenames) and a small
-    `__NEWLIB__` guard in `lib/loop_wchar.h`. Without `USE_DOS`, Kodi cannot
-    read ZIP archives and reports `item count: 0`.
-- Host tools: autoconf, automake, libtool; TexturePacker built from
-  `tools/depends/native/TexturePacker/src` with `-DTARGET_POSIX`.
+```
+/switch/kodi.nro                  NRO hbmenu launches
+/switch/kodi/{addons,media,system,userdata}
+/switch/kodi/.kodi/temp/kodi.log  log
+```
 
-## Linker and packaging
+## Port facts
 
-libnx's loader applies static relocations itself and maps three NRO segments
-(text RX, rodata R, data RW). Kodi's large PIE has relative relocations into
-sections upstream places in read-only memory:
+- Toolchain: devkitA64 GCC 16.1.0, libnx 4.12.0 from `~/nx-mod/libnx/nx`.
+- Key portlibs: curl 8.23.0 + mbedTLS 3.6.8 (switchfin releases), OpenSSL 3.0.22,
+  sqlite-nx, Brotli, full GNU libiconv with `-DUSE_DOS` (ZIP filenames),
+  libuuid stand-in, `libdl`/`librt`/`libutil` stubs.
+- `cmake/toolchain/switch.ld` places relocatable read-only sections in the
+  writable NRO segment; `tools/switch/fix_nro_size.py` fixes the ASET asset
+  offset. Both are required for hbmenu to accept the NRO.
+- Threads get 1 MiB stacks; detached threads are reaped. Kodi's CMake carries
+  small `TARGET_SWITCH` guards (upstream merge conflict points).
+- HTTPS: embedded compact CA bundle via `CURLOPT_CAINFO_BLOB` (curl's mbedTLS
+  backend supports it). Verification stays enabled.
 
-- `cmake/toolchain/switch.ld` moves `.rodata`, `.tls.align`, `.gcc_except_table`,
-  `.eh_frame`, `.gnu_extab`, `.exception_ranges` into the writable segment,
-  *after* `__data_start`, so libnx's relro reprotection range stays valid.
-  Placing them before `__data_start` causes a `2001-0106` abort in `__nx_dynamic`.
-- configure.sh installs that script over `$DEVKITPRO/libnx/switch.ld` (sudo needed).
-- Link flags: `-z notext`, `-z nopack-relative-relocs`, `--wrap=pthread_create`,
-  `--wrap=pthread_detach`, `-z max-page-size=4096`.
-- Tail libraries after `--no-whole-archive`: `-ldrm_nouveau -lglapi -lEGL
-  -luuid -lsqlite3 -lnx`.
-- `elf2nro` computes the asset offset from the sum of segment sizes; the linker
-  leaves a 64 KiB gap before RW, so `fix_nro_size.py` restores the overwritten
-  data bytes and appends the ASET asset section at the real NRO end. Without it
-  hbmenu shows `2347-0006` and unknown author/version.
+## Remaining work
 
-## Platform code
-
-- `xbmc/platform/switch`: main (sdmc mount, boot marks, sockets/nxlink),
-  `PosixCompat` (1 MiB stacks, detached-thread reaper, POSIX stubs), `DlStubs`,
-  network (nifm), storage (SD card).
-- `xbmc/windowing/switch`: EGL/GLES window system on `nwindowGetDefault()`,
-  pad/touch input via `CAppInboundProtocol`, registered as "switch".
-- `xbmc/cores/AudioEngine/Sinks/AESinkSwitch.*`: libnx `audout` PCM sink
-  (48 kHz, s16 stereo, four aligned buffers), registered in `InitStageOne`.
-- Force-included compat header: `xbmc/platform/switch/compat/switch_posix.h`.
-- Kodi CMake carries small `TARGET_SWITCH` guards; these are the upstream merge
-  conflict points: root `CMakeLists.txt`, `FindTinyXML2`, DllLoader CMake,
-  `XBTFReader`, `DNSNameCache`, `PlatformDefs.h`, `XTimeUtils`,
-  `RecursiveMutex`, `DVDInputStreamNavigator`, `CurlFile.h` (reverted), VideoRenderers.
-
-## Gaps and dead ends
-
-- **Online repositories are still being debugged.** HTTPS fails with
-  `SSL peer certificate ... not OK (60)`. Tried and reverted: `catrustfile`,
-  `CURL_CA_BUNDLE` (a curl CLI feature, not automatic in libcurl), the full
-  200 KB CA store via `CURLOPT_CAINFO`, and `CURLOPT_SSL_VERIFYPEER=0`. Those
-  caused Atmosphere fatals (`2349-0008`, libnx binder `NoInit`). Research showed
-  the installed curl is switchfin's **mbedTLS-backed 8.23.0**, not devkitPro's
-  libnx-SSL build, so the binder fatal was unrelated to CA handling. Current
-  approach (`5a831eb`) embeds a compact 37 KB bundle of 25 common roots plus
-  ISRG Root YR in `xbmc/filesystem/switch_cacert.h` and sets
-  `CURLOPT_CAINFO_BLOB` directly. No SD-side CA file is needed. Verification
-  stays enabled. Local ZIP install works regardless.
-- Python add-ons and binary add-ons are unsupported (`ENABLE_PYTHON=OFF`,
-  `dlopen` stubbed).
-- Software video decode only; no HW decode, no surround passthrough.
-- Missing JPEG/PNG image encoders → thumbnail creation errors.
-- No in-app crash handler; diagnosis uses Atmosphere crash/fatal reports plus
-  `boot.txt` and `kodi.log`.
-- Thread stack size and detached-thread reaping are workarounds, not upstream fixes.
-
-## Outstanding work
-
-- Port CI build and NRO updater from `haloce-nx`:
-  `.github/workflows/{build,switch}.yml`, `tools/ci_build.py`.
-- Consider a file-based exception handler writing `crash.txt`.
-- Revisit online repos only with a proper libnx `ssl` CA trust solution.
+- Python add-ons: static CPython 3.14.6 based on PyNeXt's Switch patches; host
+  interpreter built, target library in progress.
+- Binary add-ons: not available; `dlopen` is stubbed. Would require building
+  add-ons statically into the NRO.
+- Online repositories: HTTPS path implemented; awaiting hardware verification.
+- Hardware video decode, surround passthrough, JPEG/PNG thumbnail encoders.
+- Event clients / JSON-RPC / web server / auto-update remain disabled.
+- No in-app crash handler yet; Atmosphere reports plus `boot.txt` are used.
