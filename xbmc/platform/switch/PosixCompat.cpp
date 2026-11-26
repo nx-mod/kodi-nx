@@ -195,13 +195,14 @@ extern "C" int fstatat(int dirfd, const char* path, struct stat* st, int flags)
 }
 
 extern "C" void __real_exit(int);
+extern "C" int main(int, char**);
 
 extern "C" void __wrap_exit(int code)
 {
   FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
   if (mark)
   {
-    fprintf(mark, "exit-called %d caller %p\n", code, __builtin_return_address(0));
+    fprintf(mark, "exit-called %d caller %p main %p\n", code, __builtin_return_address(0), reinterpret_cast<void*>(&main));
     fclose(mark);
   }
   __real_exit(code);
