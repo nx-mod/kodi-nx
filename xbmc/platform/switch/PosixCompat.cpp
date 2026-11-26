@@ -193,3 +193,16 @@ extern "C" int fstatat(int dirfd, const char* path, struct stat* st, int flags)
   (void)flags;
   return stat(path, st);
 }
+
+extern "C" void __real_exit(int);
+
+extern "C" void __wrap_exit(int code)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "exit-called %d\n", code);
+    fclose(mark);
+  }
+  __real_exit(code);
+}
