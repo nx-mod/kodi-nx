@@ -749,7 +749,7 @@ void CCurlFile::SetCommonOptions(CReadState* state, bool failOnError /* = true *
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_caTrustFile);
 #ifdef TARGET_SWITCH
   g_curlInterface.easy_setopt(h, CURLOPT_CAINFO,
-                              "sdmc:/switch/kodi/system/certs/cacert-bundle.pem");
+                              "/switch/kodi/system/certs/cacert-bundle.pem");
 #else
   if (!caCert.empty() && XFILE::CFile::Exists(caCert))
     g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, caCert.c_str());
