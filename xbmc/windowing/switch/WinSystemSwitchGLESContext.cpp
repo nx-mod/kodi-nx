@@ -8,6 +8,7 @@
 
 #include "WinSystemSwitchGLESContext.h"
 
+#include "platform/switch/Shutdown.h"
 #include "ServiceBroker.h"
 #include "application/AppInboundProtocol.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
@@ -329,8 +330,12 @@ void CWinSystemSwitchGLESContext::HandleApplet()
   }
 }
 
+std::atomic<bool> g_switchShuttingDown{false};
+
 bool CWinSystemSwitchGLESContext::MessagePump()
 {
+  if (g_switchShuttingDown)
+    return false;
   HandleApplet();
   PollPad();
   PollTouch();

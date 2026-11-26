@@ -8,6 +8,7 @@
 
 #include "application/AppEnvironment.h"
 #include "application/AppParamParser.h"
+#include "platform/switch/Shutdown.h"
 #include "platform/xbmc.h"
 
 #include <cstdio>
@@ -87,6 +88,7 @@ int main(int argc, char* argv[])
   BootMark("environment-set-up");
 
   int status = XBMC_Run(true);
+  g_switchShuttingDown = true;
   BootMark("xbmc-run-returned", status);
 
   CAppEnvironment::TearDown();
