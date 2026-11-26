@@ -85,7 +85,7 @@ XBPython::XBPython()
   // for; see cmake/scripts/wasm/ExtraTargets.cmake.
   setenv("PYTHONHOME", CSpecialProtocol::TranslatePath("special://xbmc").c_str(), 1);
 #ifdef TARGET_SWITCH
-  setenv("PYTHONPATH", "sdmc:/switch/kodi/lib/python314.zip", 1);
+  setenv("PYTHONPATH", "sdmc:/switch/kodi/lib/python314", 1);
 #endif
   CLog::Log(LOGDEBUG, "PYTHONHOME -> {}", CSpecialProtocol::TranslatePath("special://xbmc"));
 #elif !defined(TARGET_WINDOWS) && !defined(TARGET_ANDROID)
