@@ -324,6 +324,7 @@ void CWinSystemSwitchGLESContext::HandleApplet()
   // appletMainLoop() processes HOME/sleep messages and returns false on an exit request.
   if (!appletMainLoop())
   {
+    g_switchShuttingDown = true;
     FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
     if (mark)
     {
