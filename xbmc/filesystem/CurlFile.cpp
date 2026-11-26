@@ -748,9 +748,8 @@ void CCurlFile::SetCommonOptions(CReadState* state, bool failOnError /* = true *
   std::string caCert = CSpecialProtocol::TranslatePath(
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_caTrustFile);
 #ifdef TARGET_SWITCH
-  curl_blob blob{const_cast<unsigned char*>(kSwitchCaCert), kSwitchCaCertSize - 1,
-                 CURL_BLOB_NOCOPY};
-  g_curlInterface.easy_setopt(h, CURLOPT_CAINFO_BLOB, &blob);
+  g_curlInterface.easy_setopt(h, CURLOPT_CAINFO,
+                              "sdmc:/switch/kodi/system/certs/cacert-bundle.pem");
 #else
   if (!caCert.empty() && XFILE::CFile::Exists(caCert))
     g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, caCert.c_str());
