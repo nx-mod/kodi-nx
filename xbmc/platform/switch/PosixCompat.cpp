@@ -207,3 +207,16 @@ extern "C" void __wrap_exit(int code)
   }
   __real_exit(code);
 }
+
+extern "C" void __real__Py_FatalErrorFunc(const char*, const char*);
+
+extern "C" void __wrap__Py_FatalErrorFunc(const char* func, const char* message)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "python-fatal %s: %s\n", func ? func : "?", message ? message : "?");
+    fclose(mark);
+  }
+  __real__Py_FatalErrorFunc(func, message);
+}
