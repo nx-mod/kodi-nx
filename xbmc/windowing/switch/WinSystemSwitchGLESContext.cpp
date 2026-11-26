@@ -324,6 +324,12 @@ void CWinSystemSwitchGLESContext::HandleApplet()
   // appletMainLoop() processes HOME/sleep messages and returns false on an exit request.
   if (!appletMainLoop())
   {
+    FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+    if (mark)
+    {
+      fprintf(mark, "applet-exit-requested\n");
+      fclose(mark);
+    }
     XBMC_Event quit{};
     quit.type = XBMC_QUIT;
     SendEvent(quit);
