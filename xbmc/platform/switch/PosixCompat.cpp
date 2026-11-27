@@ -114,9 +114,7 @@ extern "C" pid_t waitpid(pid_t, int*, int)
 }
 
 
-extern "C" void __real_diagAbortWithResult(Result);
-
-extern "C" void __wrap_diagAbortWithResult(Result rc)
+extern "C" void diagAbortWithResult(Result rc)
 {
   FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
   if (mark)
@@ -125,7 +123,7 @@ extern "C" void __wrap_diagAbortWithResult(Result rc)
             __builtin_return_address(0));
     fclose(mark);
   }
-  __real_diagAbortWithResult(rc);
+  svcExitProcess();
 }
 
 extern "C" int pause()
