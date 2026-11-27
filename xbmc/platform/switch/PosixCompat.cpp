@@ -212,6 +212,15 @@ extern "C" int __wrap__open_r(struct _reent* r, const char* path, int flags, int
   return __real__open_r(r, p.c_str(), flags, mode);
 }
 
+
+extern "C" int __real__read_r(struct _reent*, int, void*, size_t);
+
+extern "C" int __wrap__read_r(struct _reent* r, int fd, void* buf, size_t n)
+{
+  if (fd < 3) return 0;
+  return __real__read_r(r, fd, buf, n);
+}
+
 extern "C" void __real_exit(int);
 extern "C" int main(int, char**);
 
