@@ -193,6 +193,42 @@ extern "C" void __wrap_exit(int code)
   __real_exit(code);
 }
 
+extern "C" void __real_svcExitProcess(void);
+extern "C" void __wrap_svcExitProcess(void)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "svcExitProcess caller %p\n", __builtin_return_address(0));
+    fclose(mark);
+  }
+  __real_svcExitProcess();
+}
+
+extern "C" void __real_abort(void);
+extern "C" void __wrap_abort(void)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "abort caller %p\n", __builtin_return_address(0));
+    fclose(mark);
+  }
+  __real_abort();
+}
+
+extern "C" void __real__exit(int);
+extern "C" void __wrap__exit(int code)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "_exit %d caller %p\n", code, __builtin_return_address(0));
+    fclose(mark);
+  }
+  __real__exit(code);
+}
+
 extern "C" void __real__Py_FatalErrorFunc(const char*, const char*);
 
 extern "C" void __wrap__Py_FatalErrorFunc(const char* func, const char* message)
