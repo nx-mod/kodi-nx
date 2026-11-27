@@ -50,7 +50,6 @@ void BringUpServices()
 {
   appletSetFocusHandlingMode(AppletFocusHandlingMode_SuspendHomeSleepNotify);
   appletLockExit();
-  atexit([] { appletUnlockExit(); });
 
   SocketInitConfig sockCfg = *socketGetDefaultInitConfig();
   sockCfg.tcp_tx_buf_size = 0x40000;
