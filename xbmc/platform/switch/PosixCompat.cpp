@@ -187,13 +187,6 @@ extern "C" int pause()
   return -1;
 }
 
-
-extern "C" int _stat_r(struct _reent*, const char* path, struct stat* st)
-{
-  if (st) std::memset(st, 0, sizeof(struct stat));
-  return -1;
-}
-
 extern "C" int fstatat(int dirfd, const char* path, struct stat* st, int flags)
 {
   (void)dirfd;
