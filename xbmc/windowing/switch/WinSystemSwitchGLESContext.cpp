@@ -280,6 +280,9 @@ void CWinSystemSwitchGLESContext::PollPad()
 
 void CWinSystemSwitchGLESContext::PollTouch()
 {
+  if (!hidGetSharedmemAddr())
+    return;
+
   HidTouchScreenState state{};
   if (hidGetTouchScreenStates(&state, 1) == 0)
     return;
