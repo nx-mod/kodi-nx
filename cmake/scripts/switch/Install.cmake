@@ -6,7 +6,8 @@ target_link_libraries(${APP_NAME_LC}
   -lEGL -lglapi -ldrm_nouveau)
 target_link_options(${APP_NAME_LC} PRIVATE
   -Wl,-z,notext -Wl,-z,nopack-relative-relocs
-  -Wl,--wrap=exit
+  -Wl,--wrap=exit -Wl,--wrap=svcExitProcess -Wl,--wrap=abort -Wl,--wrap=_exit
+  -Wl,--wrap=__cxa_throw
   -Wl,--wrap=_Py_FatalErrorFunc -Wl,--wrap=_Py_write_noraise
   )
 

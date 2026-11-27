@@ -8,6 +8,8 @@
 
 #include <ctime>
 #include <condition_variable>
+#include <exception>
+#include <typeinfo>
 #include <deque>
 #include <mutex>
 #include <pthread.h>
@@ -222,4 +224,65 @@ extern "C" int __wrap__Py_write_noraise(int fd, const void* buf, size_t size)
     }
   }
   return __real__Py_write_noraise(fd, buf, size);
+}
+
+extern "C" void __real_abort();
+extern "C" void __wrap_abort()
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "abort caller %p main %p\n", __builtin_return_address(0),
+            reinterpret_cast<void*>(&main));
+    fclose(mark);
+  }
+  __real_abort();
+}
+
+extern "C" void __real__exit(int);
+extern "C" void __wrap__exit(int status)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "_exit %d caller %p main %p\n", status,
+            __builtin_return_address(0), reinterpret_cast<void*>(&main));
+    fclose(mark);
+  }
+  __real__exit(status);
+}
+
+extern "C" void __real_svcExitProcess();
+extern "C" void __wrap_svcExitProcess()
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "exit-process caller %p main %p\n",
+            __builtin_return_address(0), reinterpret_cast<void*>(&main));
+    fclose(mark);
+  }
+  __real_svcExitProcess();
+}
+
+extern "C" void __real___cxa_throw(void*, void*, void (*)(void*));
+extern "C" void __wrap___cxa_throw(void* exc, void* type, void (*destructor)(void*))
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    const char* name = type ? static_cast<std::type_info*>(type)->name() : "?";
+    const char* message = "";
+    try
+    {
+      message = static_cast<std::exception*>(exc)->what();
+    }
+    catch (...)
+    {
+    }
+    fprintf(mark, "cxa-throw exc %p type %s what %s caller %p\n", exc, name,
+            message, __builtin_return_address(0));
+    fclose(mark);
+  }
+  __real___cxa_throw(exc, type, destructor);
 }
