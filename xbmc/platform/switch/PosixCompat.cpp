@@ -265,3 +265,29 @@ extern "C" int __wrap__Py_write_noraise(int fd, const void* buf, size_t size)
   }
   return __real__Py_write_noraise(fd, buf, size);
 }
+
+extern "C" void __real__ZSt9terminatev();
+extern "C" void __wrap__ZSt9terminatev()
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "terminate caller %p main %p\n", __builtin_return_address(0),
+            reinterpret_cast<void*>(&main));
+    fclose(mark);
+  }
+  __real__ZSt9terminatev();
+}
+
+extern "C" void __real___cxa_throw(void*, void*, void (*)(void*));
+extern "C" void __wrap___cxa_throw(void* exc, void* type, void (*destructor)(void*))
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "cxa-throw exc %p type %p caller %p\n", exc, type,
+            __builtin_return_address(0));
+    fclose(mark);
+  }
+  __real___cxa_throw(exc, type, destructor);
+}
