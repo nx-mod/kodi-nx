@@ -9,7 +9,6 @@
 #include <ctime>
 #include <condition_variable>
 #include <exception>
-#include <execinfo.h>
 #include <typeinfo>
 #include <deque>
 #include <mutex>
@@ -284,10 +283,13 @@ extern "C" void __wrap___cxa_throw(void* exc, void* type, void (*destructor)(voi
     fprintf(mark, "cxa-throw exc %p type %s what %s caller %p main %p\n", exc,
             name, message, __builtin_return_address(0),
             reinterpret_cast<void*>(&main));
-    void* frames[8] = {};
-    const int count = backtrace(frames, 8);
-    for (int i = 0; i < count; ++i)
-      fprintf(mark, "  frame %d %p\n", i, frames[i]);
+    void** frame = nullptr;
+    asm volatile("mov %0, x29" : "=r"(frame));
+    for (int i = 0; i < 8 && frame; ++i)
+    {
+      fprintf(mark, "  frame %d %p\n", i, frame[1]);
+      frame = reinterpret_cast<void**>(frame[0]);
+    }
     fclose(mark);
   }
   __real___cxa_throw(exc, type, destructor);
