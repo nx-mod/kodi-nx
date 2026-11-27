@@ -833,6 +833,8 @@ const char* CAddonInfoBuilder::GetPlatformLibraryName(const tinyxml2::XMLElement
     libraryName = element->Attribute("library_windows");
 #elif defined(TARGET_WINDOWS_STORE)
   libraryName = element->Attribute("library_windowsstore");
+#elif defined(TARGET_SWITCH)
+  libraryName = element->Attribute("library_switch");
 #elif defined(TARGET_DARWIN)
 #if defined(TARGET_DARWIN_EMBEDDED)
   libraryName = element->Attribute("library_darwin_embedded");
