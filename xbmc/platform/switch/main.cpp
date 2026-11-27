@@ -49,7 +49,6 @@ void BootMark(const char* what, int value = 0)
 void BringUpServices()
 {
   appletSetFocusHandlingMode(AppletFocusHandlingMode_SuspendHomeSleepNotify);
-  appletLockExit();
 
   SocketInitConfig sockCfg = *socketGetDefaultInitConfig();
   sockCfg.tcp_tx_buf_size = 0x40000;
