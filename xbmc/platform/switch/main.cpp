@@ -66,7 +66,6 @@ void BringUpServices()
 int main(int argc, char* argv[])
 {
   fsdevMountSdmc();
-  randomInitialize();
 
   OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS, nullptr);
 
