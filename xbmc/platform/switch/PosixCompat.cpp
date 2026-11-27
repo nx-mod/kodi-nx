@@ -194,6 +194,24 @@ extern "C" int fstatat(int dirfd, const char* path, struct stat* st, int flags)
   return stat(path, st);
 }
 
+
+extern "C" int __real__open_r(struct _reent*, const char*, int, int);
+
+static std::string NormalizeSwitchPath(const char* path)
+{
+  if (!path || !*path) return std::string("sdmc:/");
+  std::string p(path);
+  if (p.find(':') != std::string::npos) return p;
+  if (p[0] == '/') return "sdmc:" + p;
+  return "sdmc:/" + p;
+}
+
+extern "C" int __wrap__open_r(struct _reent* r, const char* path, int flags, int mode)
+{
+  std::string p = NormalizeSwitchPath(path);
+  return __real__open_r(r, p.c_str(), flags, mode);
+}
+
 extern "C" void __real_exit(int);
 extern "C" int main(int, char**);
 
