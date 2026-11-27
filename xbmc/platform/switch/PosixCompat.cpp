@@ -126,6 +126,44 @@ extern "C" void diagAbortWithResult(Result rc)
   svcExitProcess();
 }
 
+extern "C" void fatalThrow(Result err)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "fatalThrow 0x%x caller %p\n", static_cast<unsigned>(err),
+            __builtin_return_address(0));
+    fclose(mark);
+  }
+  svcExitProcess();
+}
+
+extern "C" void fatalThrowWithPolicy(Result err, FatalPolicy type)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "fatalThrowWithPolicy 0x%x policy %d caller %p\n",
+            static_cast<unsigned>(err), static_cast<int>(type),
+            __builtin_return_address(0));
+    fclose(mark);
+  }
+  svcExitProcess();
+}
+
+extern "C" void fatalThrowWithContext(Result err, FatalPolicy type, FatalCpuContext* ctx)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "fatalThrowWithContext 0x%x policy %d ctx %p caller %p\n",
+            static_cast<unsigned>(err), static_cast<int>(type), static_cast<void*>(ctx),
+            __builtin_return_address(0));
+    fclose(mark);
+  }
+  svcExitProcess();
+}
+
 extern "C" int pause()
 {
   for (;;)
