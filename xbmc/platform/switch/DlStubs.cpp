@@ -6,37 +6,15 @@
  *  See LICENSES/README.md for more information.
  */
 
-#include <cstring>
 #include <dlfcn.h>
 
-extern "C" int vfs_tmdbm_ADDON_Create(void*);
-extern "C" const char* vfs_tmdbm_ADDON_GetTypeVersion(int);
-extern "C" const char* vfs_tmdbm_ADDON_GetTypeMinVersion(int);
-
-namespace
+extern "C" void* dlopen(const char*, int)
 {
-int g_vfsTmdbmHandle;
-}
-
-extern "C" void* dlopen(const char* path, int)
-{
-  if (path && std::strstr(path, "vfs.tmdbm"))
-    return &g_vfsTmdbmHandle;
   return nullptr;
 }
 
-extern "C" void* dlsym(void* handle, const char* name)
+extern "C" void* dlsym(void*, const char*)
 {
-  if (handle != &g_vfsTmdbmHandle || !name)
-    return nullptr;
-
-  if (std::strcmp(name, "ADDON_Create") == 0)
-    return reinterpret_cast<void*>(&vfs_tmdbm_ADDON_Create);
-  if (std::strcmp(name, "ADDON_GetTypeVersion") == 0)
-    return reinterpret_cast<void*>(&vfs_tmdbm_ADDON_GetTypeVersion);
-  if (std::strcmp(name, "ADDON_GetTypeMinVersion") == 0)
-    return reinterpret_cast<void*>(&vfs_tmdbm_ADDON_GetTypeMinVersion);
-
   return nullptr;
 }
 
