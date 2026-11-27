@@ -113,31 +113,6 @@ extern "C" pid_t waitpid(pid_t, int*, int)
   return -1;
 }
 
-extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
-
-extern "C" int __wrap_pthread_create(pthread_t* thread,
-                                     const pthread_attr_t* attr,
-                                     void* (*start)(void*),
-                                     void* arg)
-{
-  if (attr)
-    return __real_pthread_create(thread, attr, start, arg);
-
-  pthread_attr_t big;
-  pthread_attr_init(&big);
-  pthread_attr_setstacksize(&big, 1u << 20);
-  const int rc = __real_pthread_create(thread, &big, start, arg);
-  pthread_attr_destroy(&big);
-  return rc;
-}
-
-extern "C" int __real_pthread_detach(pthread_t thread);
-
-extern "C" int __wrap_pthread_detach(pthread_t thread)
-{
-  return __real_pthread_detach(thread);
-}
-
 extern "C" int pause()
 {
   for (;;)
