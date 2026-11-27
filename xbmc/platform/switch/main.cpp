@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <switch.h>
+#include <openssl/crypto.h>
 
 namespace
 {
@@ -65,6 +66,8 @@ void BringUpServices()
 int main(int argc, char* argv[])
 {
   fsdevMountSdmc();
+
+  OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS, nullptr);
 
   mkdir(KODI_ROOT, 0777);
   BootMark("main-entered");
