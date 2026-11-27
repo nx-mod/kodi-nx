@@ -211,7 +211,10 @@ extern "C" void __wrap_abort(void)
   FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
   if (mark)
   {
-    fprintf(mark, "abort caller %p\n", __builtin_return_address(0));
+    fprintf(mark, "abort caller %p main %p frames %p %p %p\n",
+            __builtin_return_address(0), reinterpret_cast<void*>(&main),
+            __builtin_return_address(1), __builtin_return_address(2),
+            __builtin_return_address(3));
     fclose(mark);
   }
   __real_abort();
@@ -223,7 +226,10 @@ extern "C" void __wrap__exit(int code)
   FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
   if (mark)
   {
-    fprintf(mark, "_exit %d caller %p\n", code, __builtin_return_address(0));
+    fprintf(mark, "_exit %d caller %p main %p frames %p %p %p\n", code,
+            __builtin_return_address(0), reinterpret_cast<void*>(&main),
+            __builtin_return_address(1), __builtin_return_address(2),
+            __builtin_return_address(3));
     fclose(mark);
   }
   __real__exit(code);
