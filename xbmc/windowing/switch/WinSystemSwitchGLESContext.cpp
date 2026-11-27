@@ -349,7 +349,6 @@ bool CWinSystemSwitchGLESContext::MessagePump()
 {
   if (g_switchShuttingDown)
     return false;
-  HandleApplet();
   PollPad();
   PollTouch();
   return true;
