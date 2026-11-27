@@ -250,12 +250,7 @@ void CWinSystemSwitchGLESContext::PushKey(uint32_t sym, bool down)
 void CWinSystemSwitchGLESContext::PollPad()
 {
   if (!hidGetSharedmemAddr())
-  {
-    hidInitialize();
-    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
-    padInitializeDefault(&m_pad);
     return;
-  }
 
   padUpdate(&m_pad);
   const uint64_t held = padGetButtons(&m_pad);

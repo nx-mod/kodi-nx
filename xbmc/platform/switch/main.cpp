@@ -11,6 +11,8 @@
 #include "platform/switch/Shutdown.h"
 #include "platform/xbmc.h"
 
+#include <atomic>
+
 #include <cstdio>
 #include <cstdlib>
 #include <locale.h>
@@ -46,10 +48,19 @@ void BootMark(const char* what, int value = 0)
   fsFileClose(&file);
 }
 
+std::atomic<bool> g_switchExitLocked{false};
+
 void BringUpServices()
 {
   appletSetFocusHandlingMode(AppletFocusHandlingMode_SuspendHomeSleepNotify);
-  appletLockExit();
+  if (R_SUCCEEDED(appletLockExit()))
+  {
+    g_switchExitLocked = true;
+    atexit([] {
+      if (g_switchExitLocked.exchange(false))
+        appletUnlockExit();
+    });
+  }
 
   SocketInitConfig sockCfg = *socketGetDefaultInitConfig();
   sockCfg.tcp_tx_buf_size = 0x40000;

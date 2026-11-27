@@ -131,53 +131,11 @@ extern "C" int __wrap_pthread_create(pthread_t* thread,
   return rc;
 }
 
-namespace
-{
-std::mutex g_reapMutex;
-std::condition_variable g_reapCv;
-std::deque<pthread_t> g_reapQueue;
-bool g_reaperRunning = false;
-
-void* Reaper(void*)
-{
-  for (;;)
-  {
-    pthread_t t;
-    {
-      std::unique_lock<std::mutex> lock(g_reapMutex);
-      g_reapCv.wait(lock, [] { return !g_reapQueue.empty(); });
-      t = g_reapQueue.front();
-      g_reapQueue.pop_front();
-    }
-    pthread_join(t, nullptr);
-  }
-  return nullptr;
-}
-
-void StartReaper()
-{
-  pthread_attr_t attr;
-  pthread_attr_init(&attr);
-  pthread_attr_setstacksize(&attr, 64 * 1024);
-  pthread_t reaper;
-  const int rc = __real_pthread_create(&reaper, &attr, Reaper, nullptr);
-  pthread_attr_destroy(&attr);
-  g_reaperRunning = rc == 0;
-}
-} // namespace
+extern "C" int __real_pthread_detach(pthread_t thread);
 
 extern "C" int __wrap_pthread_detach(pthread_t thread)
 {
-  static std::once_flag once;
-  std::call_once(once, StartReaper);
-  if (!g_reaperRunning)
-    return 0;
-  {
-    std::lock_guard<std::mutex> lock(g_reapMutex);
-    g_reapQueue.push_back(thread);
-  }
-  g_reapCv.notify_one();
-  return 0;
+  return __real_pthread_detach(thread);
 }
 
 extern "C" int pause()
@@ -194,32 +152,6 @@ extern "C" int fstatat(int dirfd, const char* path, struct stat* st, int flags)
   return stat(path, st);
 }
 
-
-extern "C" int __real__open_r(struct _reent*, const char*, int, int);
-
-static std::string NormalizeSwitchPath(const char* path)
-{
-  if (!path || !*path) return std::string("sdmc:/");
-  std::string p(path);
-  if (p.find(':') != std::string::npos) return p;
-  if (p[0] == '/') return "sdmc:" + p;
-  return "sdmc:/" + p;
-}
-
-extern "C" int __wrap__open_r(struct _reent* r, const char* path, int flags, int mode)
-{
-  std::string p = NormalizeSwitchPath(path);
-  return __real__open_r(r, p.c_str(), flags, mode);
-}
-
-
-extern "C" int __real__read_r(struct _reent*, int, void*, size_t);
-
-extern "C" int __wrap__read_r(struct _reent* r, int fd, void* buf, size_t n)
-{
-  if (fd < 3) return 0;
-  return __real__read_r(r, fd, buf, n);
-}
 
 extern "C" void __real_exit(int);
 extern "C" int main(int, char**);

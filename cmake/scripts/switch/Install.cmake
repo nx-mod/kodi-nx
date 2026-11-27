@@ -5,8 +5,6 @@ target_link_libraries(${APP_NAME_LC}
   -lEGL -lglapi -ldrm_nouveau)
 target_link_options(${APP_NAME_LC} PRIVATE
   -Wl,-z,notext -Wl,-z,nopack-relative-relocs
-  -Wl,--wrap=pthread_create -Wl,--wrap=pthread_detach
-  -Wl,--wrap=_open_r
-  -Wl,--wrap=_read_r)
+  -Wl,--wrap=pthread_create -Wl,--wrap=pthread_detach)
 
 include(${CMAKE_SOURCE_DIR}/cmake/scripts/switch/Package.cmake OPTIONAL)
