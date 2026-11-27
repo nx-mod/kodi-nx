@@ -349,6 +349,7 @@ bool CWinSystemSwitchGLESContext::MessagePump()
 {
   if (g_switchShuttingDown)
     return false;
-  // HID polling disabled until sharedmem loss is handled without diagAbort.
+  PollPad();
+  PollTouch();
   return true;
 }

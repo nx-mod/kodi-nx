@@ -48,20 +48,8 @@ void BootMark(const char* what, int value = 0)
   fsFileClose(&file);
 }
 
-std::atomic<bool> g_switchExitLocked{false};
-
 void BringUpServices()
 {
-  appletSetFocusHandlingMode(AppletFocusHandlingMode_SuspendHomeSleepNotify);
-  if (R_SUCCEEDED(appletLockExit()))
-  {
-    g_switchExitLocked = true;
-    atexit([] {
-      if (g_switchExitLocked.exchange(false))
-        appletUnlockExit();
-    });
-  }
-
   SocketInitConfig sockCfg = *socketGetDefaultInitConfig();
   sockCfg.tcp_tx_buf_size = 0x40000;
   sockCfg.tcp_rx_buf_size = 0x80000;
