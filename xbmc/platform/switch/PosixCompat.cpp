@@ -113,6 +113,21 @@ extern "C" pid_t waitpid(pid_t, int*, int)
   return -1;
 }
 
+
+extern "C" void __real_diagAbortWithResult(Result);
+
+extern "C" void __wrap_diagAbortWithResult(Result rc)
+{
+  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
+  if (mark)
+  {
+    fprintf(mark, "diagAbort 0x%x caller %p\n", static_cast<unsigned>(rc),
+            __builtin_return_address(0));
+    fclose(mark);
+  }
+  __real_diagAbortWithResult(rc);
+}
+
 extern "C" int pause()
 {
   for (;;)
