@@ -883,6 +883,11 @@ bool CAddonInfoBuilder::PlatformSupportsAddon(const AddonInfoPtr& addon)
 #else
     #warning no architecture dependant platform tag
 #endif
+#elif defined(TARGET_SWITCH)
+    "switch",
+#if defined(__aarch64__)
+    "switch-aarch64",
+#endif
 #elif defined(TARGET_WINDOWS_DESKTOP)
     "windx",
     "windows",
