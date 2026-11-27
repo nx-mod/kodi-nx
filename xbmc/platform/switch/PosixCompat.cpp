@@ -193,48 +193,6 @@ extern "C" void __wrap_exit(int code)
   __real_exit(code);
 }
 
-extern "C" void __real_svcExitProcess(void);
-extern "C" void __wrap_svcExitProcess(void)
-{
-  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
-  if (mark)
-  {
-    fprintf(mark, "svcExitProcess caller %p\n", __builtin_return_address(0));
-    fclose(mark);
-  }
-  __real_svcExitProcess();
-}
-
-extern "C" void __real_abort(void);
-extern "C" void __wrap_abort(void)
-{
-  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
-  if (mark)
-  {
-    fprintf(mark, "abort caller %p main %p frames %p %p %p\n",
-            __builtin_return_address(0), reinterpret_cast<void*>(&main),
-            __builtin_return_address(1), __builtin_return_address(2),
-            __builtin_return_address(3));
-    fclose(mark);
-  }
-  __real_abort();
-}
-
-extern "C" void __real__exit(int);
-extern "C" void __wrap__exit(int code)
-{
-  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
-  if (mark)
-  {
-    fprintf(mark, "_exit %d caller %p main %p frames %p %p %p\n", code,
-            __builtin_return_address(0), reinterpret_cast<void*>(&main),
-            __builtin_return_address(1), __builtin_return_address(2),
-            __builtin_return_address(3));
-    fclose(mark);
-  }
-  __real__exit(code);
-}
-
 extern "C" void __real__Py_FatalErrorFunc(const char*, const char*);
 
 extern "C" void __wrap__Py_FatalErrorFunc(const char* func, const char* message)
@@ -264,30 +222,4 @@ extern "C" int __wrap__Py_write_noraise(int fd, const void* buf, size_t size)
     }
   }
   return __real__Py_write_noraise(fd, buf, size);
-}
-
-extern "C" void __real__ZSt9terminatev();
-extern "C" void __wrap__ZSt9terminatev()
-{
-  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
-  if (mark)
-  {
-    fprintf(mark, "terminate caller %p main %p\n", __builtin_return_address(0),
-            reinterpret_cast<void*>(&main));
-    fclose(mark);
-  }
-  __real__ZSt9terminatev();
-}
-
-extern "C" void __real___cxa_throw(void*, void*, void (*)(void*));
-extern "C" void __wrap___cxa_throw(void* exc, void* type, void (*destructor)(void*))
-{
-  FILE* mark = fopen("sdmc:/switch/kodi/boot.txt", "a");
-  if (mark)
-  {
-    fprintf(mark, "cxa-throw exc %p type %p caller %p\n", exc, type,
-            __builtin_return_address(0));
-    fclose(mark);
-  }
-  __real___cxa_throw(exc, type, destructor);
 }
